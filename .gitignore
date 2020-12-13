@@ -1,0 +1,7 @@
+env/
+tmp/
+*.log
+*.pyc
+__pycache__/
+*swp
+
