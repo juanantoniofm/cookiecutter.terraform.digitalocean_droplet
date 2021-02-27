@@ -11,15 +11,15 @@ resource "digitalocean_droplet" "web" {
   private_networking = true
   tags               = ["{{cookiecutter.project_slug}}-web"]
   user_data = templatefile("user-data.yaml.tmpl", {
-  {% if cookiecutter.enable_database == "yes" %}
-
+    {% if cookiecutter.enable_database == "yes" %}
     dbpassword         = digitalocean_database_user.{{cookiecutter.project_slug}}.password
     dbhost             = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.host
     dbport             = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.port
     dbname             = digitalocean_database_db.{{cookiecutter.project_slug}}db.name
-  {% endif %}
+    {% endif %}
     ssh_{{cookiecutter.project_slug}}_password = random_password.ssh_{{cookiecutter.project_slug}}_password.result
     ssh_{{cookiecutter.project_slug}}_pkey     = filebase64("../.secrets/deploy")
+    ssh_admin_public   = file("../.secrets/admin.pub") # Load the admins key. created with make init.
   })
   ssh_keys = [digitalocean_ssh_key.{{cookiecutter.project_slug}}_key.id]
 }

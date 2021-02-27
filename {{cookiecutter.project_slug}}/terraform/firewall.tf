@@ -3,7 +3,7 @@ resource "digitalocean_firewall" "web" {
   name = "only-ssh-and-web"
 
   droplet_ids = [digitalocean_droplet.web.id]
-  tags        = ["jatos-web"]
+  tags        = ["{{cookiecutter.project_slug}}-web"]
 
   inbound_rule {
     protocol         = "tcp"
@@ -58,7 +58,7 @@ resource "digitalocean_firewall" "web" {
   }
 
   // Development ports. Only enable while working on infrastructure changes.
-  // JATOS Backend port
+  // {{cookiecutter.project_slug}} Backend port
   inbound_rule {
     protocol         = "tcp"
     port_range       = "9000"
@@ -78,8 +78,8 @@ resource "digitalocean_firewall" "web" {
 {% if cookiecutter.enable_database == "yes" %}
 
 
-resource "digitalocean_database_firewall" "mysql_jatos_fw" {
-  cluster_id = digitalocean_database_cluster.mysql_jatos.id
+resource "digitalocean_database_firewall" "mysql_{{cookiecutter.project_slug}}_fw" {
+  cluster_id = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.id
 
   rule {
     type  = "ip_addr"
@@ -93,7 +93,7 @@ resource "digitalocean_database_firewall" "mysql_jatos_fw" {
 
   rule {
     type  = "tag"
-    value = "jatos-web"
+    value = "{{cookiecutter.project_slug}}-web"
   }
 
 }
