@@ -1,8 +1,8 @@
 
 {% if cookiecutter.enable_database == "yes" %}
 
-resource "digitalocean_database_cluster" "mysql_jatos" {
-  name       = "jatos-mysql-cluster"
+resource "digitalocean_database_cluster" "mysql_{{cookiecutter.project_slug}}" {
+  name       = "{{cookiecutter.project_slug}}-mysql-cluster"
   engine     = "mysql"
   version    = "8"
   size       = "db-s-1vcpu-2gb"
@@ -12,17 +12,17 @@ resource "digitalocean_database_cluster" "mysql_jatos" {
     day  = "monday"
     hour = "01:00"
   }
-  tags = ["jatos-web"]
+  tags = ["{{cookiecutter.project_slug}}-web"]
 }
 
-resource "digitalocean_database_db" "jatosdb" {
-  cluster_id = digitalocean_database_cluster.mysql_jatos.id
-  name       = "jatosdb"
+resource "digitalocean_database_db" "{{cookiecutter.project_slug}}db" {
+  cluster_id = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.id
+  name       = "{{cookiecutter.project_slug}}db"
 }
 
-resource "digitalocean_database_user" "jatos" {
-  cluster_id = digitalocean_database_cluster.mysql_jatos.id
-  name       = "jatos"
+resource "digitalocean_database_user" "{{cookiecutter.project_slug}}user" {
+  cluster_id = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.id
+  name       = "{{cookiecutter.project_slug}}user"
 }
 
 {% endif %}

@@ -19,6 +19,8 @@ def run_command(command):
 
     It would be better to have autosplit of the string instead.
     """
+    print("Running Commansd post gen project")
+    print(command)
     out = subprocess.run(command)
     if out.returncode != 0:
         print(f"Error running command: {command}")
@@ -35,6 +37,10 @@ def run_make_init():
     """
     run_command(["cd", "{{cookiecutter.project_slug}}", ";", "make","init"])
 
-if cookiecutter.enable_database != "yes":
+db_wish = "{{cookiecutter.enable_database}}"
+enable_db = db_wish.lower().startswith("y")
+
+if enable_db:
     ## If the user doesn't want a database, delete the resources
     # TODO: delete the database.tf file after creation.
+    pass

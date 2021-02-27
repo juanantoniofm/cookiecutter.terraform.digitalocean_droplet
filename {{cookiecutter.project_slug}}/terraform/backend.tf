@@ -37,6 +37,13 @@ resource "random_password" "ssh_{{cookiecutter.project_slug}}_password" {
 }
 
 
+// Because we want a floating IP that persists between refreshes
+resource "digitalocean_floating_ip" "external_ip" {
+  droplet_id = digitalocean_droplet.web.id
+  region     = digitalocean_droplet.web.region
+}
+
+
 resource "local_file" "sshconf" {
   content  = <<-EOT
         Host {{cookiecutter.project_slug}}-rescue

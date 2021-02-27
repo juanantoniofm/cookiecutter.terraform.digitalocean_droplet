@@ -2,25 +2,25 @@
 {% if cookiecutter.enable_database == "yes" %}
 
 output "dbpassword" {
-  value     = digitalocean_database_user.jatos.password
+  value     = digitalocean_database_user.{{cookiecutter.project_slug}}.password
   sensitive = true
 }
 
 output "dbhost" {
   description = "Public URI of db instance"
-  value       = digitalocean_database_cluster.mysql_jatos.host
+  value       = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.host
 }
 
 
 output "dbport" {
   description = "DB Port"
-  value       = digitalocean_database_cluster.mysql_jatos.port
+  value       = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.port
 }
 
 
 output "private_uri" {
   description = "Private URI of the database cluster"
-  value       = digitalocean_database_cluster.mysql_jatos.private_uri
+  value       = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.private_uri
 }
 
 {% endif %}
@@ -30,8 +30,8 @@ output "web_ip" {
 }
 
 
-output "ssh_jatos_password" {
-  description = "SSH Password for the Jatos droplet."
-  value       = random_password.ssh_jatos_password.result
+output "ssh_{{cookiecutter.project_slug}}_password" {
+  description = "SSH Password for the {{cookiecutter.project_slug}} droplet."
+  value       = random_password.ssh_{{cookiecutter.project_slug}}_password.result
   sensitive   = true
 }
