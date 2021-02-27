@@ -1,0 +1,11 @@
+{
+    "project_title" : "Terraforming Jatos",
+    "project_slug" : "jatos",
+    "repo_name": "terraforming.jatos",
+    "project_description": "Using terraform to create a JATOS server on digital ocean",
+    "digitalocean_token": "visit digitalocean.com to get one",
+    "enable_database" : "yes",
+    "application_repo": "Provide a repo to be cloned in user data",
+    "application_command": "A command like `make init start` to start the app"
+
+}

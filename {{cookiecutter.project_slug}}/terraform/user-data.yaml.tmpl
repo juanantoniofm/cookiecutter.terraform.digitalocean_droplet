@@ -1,0 +1,144 @@
+#cloud-config
+users:
+  - name: {{cookiecutter.project_slug}}
+    ssh-authorized-keys:
+      - ${ssh_admin_public} # Loading the public key dynamically
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    groups:
+      - sudo
+      - docker
+    shell: /bin/bash
+    lock-passwd: false # Set to false to allow password login
+    passwd: thisisanonoptionalparameterforgodssakeputherewharevweryouwant
+    # The passwd is an optional mandatory argument. no password, account locked.
+
+
+groups:
+  - docker
+
+write-files:
+write_files:
+  - path: /root/.ssh/id_rsa.b64
+    permissions: "600"
+    content: |
+      ${ssh_{{cookiecutter.project_slug}}_pkey}
+
+  
+  - path: /etc/environment
+    permissions: "666"
+    content: |
+      # Trafiek External domain name
+      DOMAIN_NAME="external-domain.name.com"
+      EMAIL="juanantoniofm.11@gmail.com"
+
+      {% if cookiecutter.enable_database == "yes" %}
+      # Generic DB info
+      DB_DNS=${dbhost}
+      DB_PORT=${dbport}
+      # Project's database connection
+      DB_USERNAME={{cookiecutter.project_slug}}user
+      DB_PASSWORD=${dbpassword}
+      DB_DRIVER=com.mysql.cj.jdbc.Driver
+      DB_URL=jdbc:mysql://${dbhost}:${dbport}/${dbname}?characterEncoding=UTF-8
+      {% endif %}
+
+    append: true
+
+  - path: /etc/ssh/sshd_config
+    content: |
+
+      #       $OpenBSD: sshd_config,v 1.103 2018/04/09 20:41:22 tj Exp $
+
+      Include /etc/ssh/sshd_config.d/*.conf
+
+      Port 22022
+      #AddressFamily any
+      #ListenAddress 0.0.0.0
+      #ListenAddress ::
+
+      #HostKey /etc/ssh/ssh_host_rsa_key
+      #HostKey /etc/ssh/ssh_host_ecdsa_key
+      #HostKey /etc/ssh/ssh_host_ed25519_key
+
+      # Authentication:
+
+      #LoginGraceTime 2m
+      PermitRootLogin yes
+      #StrictModes yes
+      #MaxAuthTries 6
+      #MaxSessions 10
+
+      PubkeyAuthentication yes
+
+      # Expect .ssh/authorized_keys2 to be disregarded by default in future.
+      #AuthorizedKeysFile     .ssh/authorized_keys .ssh/authorized_keys2
+
+      # For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+      #HostbasedAuthentication no
+      # Change to yes if you don't trust ~/.ssh/known_hosts for
+      # HostbasedAuthentication
+      #IgnoreUserKnownHosts no
+      # Don't read the user's ~/.rhosts and ~/.shosts files
+      IgnoreRhosts yes
+
+      # To disable tunneled clear text passwords, change to no here!
+      PasswordAuthentication no
+      PermitEmptyPasswords no
+
+      # Change to yes to enable challenge-response passwords (beware issues with
+      # some PAM modules and threads)
+      ChallengeResponseAuthentication no
+
+      # no default banner path
+      #Banner none
+
+      # Allow client to pass locale environment variables
+      AcceptEnv LANG LC_*
+
+      # override default of no subsystems
+      Subsystem sftp  /usr/lib/openssh/sftp-server
+
+  - path: /home//.bashrc
+    owner: "{{cookiecutter.project_slug}}:{{cookiecutter.project_slug}}"
+    permissions: "774"
+    content: |
+      alias vim="vim -p"
+
+package_update: true
+package_upgrade: true
+packages:
+  - git
+  - vim-nox
+  - zsh
+  - net-tools
+  - docker.io
+  - docker-compose
+  - mysql-client-core-8.0
+  - etckeeper
+  - make
+
+runcmd:
+  # Apply the custom ssh config
+  - chmod 755 /var/tmp
+  - chown {{cookiecutter.project_slug}}:{{cookiecutter.project_slug}} /home/{{cookiecutter.project_slug}}
+  - passwd -d {{cookiecutter.project_slug}} # Just because we don't want any fucking password
+  # Configure SSH client keys and stuff
+  - echo $(cat /root/.ssh/id_rsa.b64) | openssl base64 -A -d > /root/.ssh/id_rsa
+  - chmod 600 /root/.ssh/id_rsa
+  - rm /root/.ssh/id_rsa.b64
+  - mkdir -p ~/.ssh # For some reason the keyscan failed 
+  - ssh-keyscan github.com >> ~/.ssh/known_hosts
+  - ssh-keyscan github.com >> /home/{{cookiecutter.project_slug}}/.ssh/known_hosts
+  - ssh-keyscan github.com >> /root/.ssh/known_hosts
+  # Clone the repo
+  - git clone {{cookiecutter.application_repo}} app
+  - ln -s /app /home/{{cookiecutter.project_slug}}/app
+  - ln -s /etc/environment /app/environment
+  # Start the service
+  - cd app
+  - {{cookiecutter.application_command}}
+
+
+system_info:
+  default_user:
+    groups: [docker]
