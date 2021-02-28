@@ -49,9 +49,9 @@ plan:
 	cd terraform; terraform fmt; terraform plan
 
 ssh:  ## Login to the machine using root
-	cd terraform; ssh -F ssh_config.tmp jatos-web
+	cd terraform; ssh -F ssh_config.tmp {{cookiecutter.project_slug}}-web
 
 test:  ## validate that the machine is reachable
-	$(shell cd terraform; pwd; ssh -F ssh_config.tmp  -o "StrictHostKeyChecking no" -o "VisualHostKey yes" jatos-web ls -lart | grep ".ssh"; echo $?)
+	$(shell cd terraform; pwd; ssh -F ssh_config.tmp  -o "StrictHostKeyChecking no" -o "VisualHostKey yes" {{cookiecutter.project_slug}}-web ls -lart | grep ".ssh"; echo $?)
 
 
