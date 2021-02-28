@@ -12,7 +12,7 @@ resource "digitalocean_droplet" "web" {
   tags               = ["{{cookiecutter.project_slug}}-web"]
   user_data = templatefile("user-data.yaml.tmpl", {
     {% if cookiecutter.enable_database == "yes" %}
-    dbpassword         = digitalocean_database_user.{{cookiecutter.project_slug}}.password
+    dbpassword         = digitalocean_database_user.{{cookiecutter.project_slug}}user.password
     dbhost             = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.host
     dbport             = digitalocean_database_cluster.mysql_{{cookiecutter.project_slug}}.port
     dbname             = digitalocean_database_db.{{cookiecutter.project_slug}}db.name

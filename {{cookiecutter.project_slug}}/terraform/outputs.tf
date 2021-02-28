@@ -2,7 +2,7 @@
 {% if cookiecutter.enable_database == "yes" %}
 
 output "dbpassword" {
-  value     = digitalocean_database_user.{{cookiecutter.project_slug}}.password
+  value     = digitalocean_database_user.{{cookiecutter.project_slug}}user.password
   sensitive = true
 }
 
